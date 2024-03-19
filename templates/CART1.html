@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RustBucket</title>
+    <link rel="stylesheet" href="{{url_for('static',filename= 'stylem.css')}}">
+    <link href="{{url_for('static',filename= 'assets/font-awesome-4.7.0')}}">
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+main {
+    padding: 20px;
+}
+
+.cart-items {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.cart-item {
+    border-bottom: 1px solid #eee;
+    padding: 20px 0;
+}
+
+.cart-item h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.cart-item p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.quantity-input {
+    width: 50px;
+    padding: 5px;
+    margin-right: 10px;
+}
+
+.remove-button {
+    background-color: #ff5757;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cart-summary {
+    margin-top: 20px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.cart-summary p {
+    margin: 5px 0;
+}
+
+.btn {
+    background-color: #09ff00;
+    color: #fff;
+    text-align: center;
+    padding: 10px 10px;
+}
+    </style>
+</head>
+<body>
+    <div class="ful-page">
+        <div class="navbar">
+            <div>
+                <a href=''>RUSTBUCKET</a>
+            </div>
+            <nav>
+                <ul id='MenuItems'>
+                    <li><a href="/signN">Home</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/shop">Shop</a></li>
+                    <li><a href="/Cnt">Contact</a></li>
+                    <li><a href="/cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i>Cart</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <header>
+            <h1>Shopping Cart</h1>
+        </header>
+        <main>
+            <section class="cart-items">
+                <div id="cart-item-list">
+                    <!-- Cart items will be added dynamically here -->
+                </div>
+                <div id="cart-summary">
+                    <p>Total Number of Products: <span id="total-products">0</span></p>
+                    <p>Total Price: RS: <span id="total-price">0.00</span></p> <br>
+                     <button class="btn">SHIP</button>
+                    </div>
+                
+            </section>
+        </main>
+
+            
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const cartItemsContainer = document.getElementById('cart-item-list');
+                const totalProductsElement = document.getElementById('total-products');
+                const totalPriceElement = document.getElementById('total-price');
+        
+                let cart = localStorage.getItem('cart');
+                if (!cart) {
+                    cart = [];
+                } else {
+                    cart = JSON.parse(cart);
+                }
+        
+                updateCartUI(cart);
+        
+                function updateCartUI(cart) {
+                    cartItemsContainer.innerHTML = '';
+                    let totalProducts = 0;
+                    let totalPrice = 0;
+        
+                    cart.forEach((item, index) => {
+                        const cartItemElement = document.createElement('div');
+                        cartItemElement.classList.add('cart-item');
+                        cartItemElement.innerHTML = `
+                            <h2>${item.name}</h2>
+                            <p>Price: Rs: ${item.price}</p>
+                            <label for="quantity-${index}">Quantity:</label>
+                            <input type="number" id="quantity-${index}" class="quantity-input" value="${item.quantity}">
+                            <button class="remove-button" data-index="${index}">Remove</button>
+                        `;
+                        cartItemsContainer.appendChild(cartItemElement);
+        
+                        totalProducts += item.quantity; // Update total products with item quantity
+                        totalPrice += item.price * item.quantity; // Update total price with item price multiplied by quantity
+                    });
+        
+                    totalProductsElement.textContent = totalProducts;
+                    totalPriceElement.textContent = totalPrice.toFixed(2);
+        
+                    const quantityInputs = document.querySelectorAll('.quantity-input');
+                    quantityInputs.forEach(input => {
+                        input.addEventListener('input', () => {
+                            updateCartQuantity(input);
+                        });
+                    });
+        
+                    const removeButtons = document.querySelectorAll('.remove-button');
+                    removeButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            removeFromCart(button.dataset.index);
+                        });
+                    });
+                }
+        
+                function updateCartQuantity(input) {
+                    const index = parseInt(input.id.split('-')[1]);
+                    const newQuantity = parseInt(input.value);
+                    cart[index].quantity = newQuantity;
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartUI(cart); // Update UI after changing quantity
+                }
+        
+                function removeFromCart(index) {
+                    cart.splice(index, 1);
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartUI(cart); // Update UI after removing item
+                }
+        
+                function addToCart(productName, productPrice) {
+                    let existingProductIndex = cart.findIndex(item => item.name === productName);
+                    if (existingProductIndex !== -1) {
+                        // Product already exists in the cart, update its quantity
+                        cart[existingProductIndex].quantity++;
+                    } else {
+                        // Product does not exist in the cart, add it
+                        cart.push({ name: productName, price: productPrice, quantity: 1 });
+                    }
+        
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartUI(cart);
+                }
+        
+                const addToCartButtons = document.querySelectorAll('.add-to-cart');
+                addToCartButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const productName = button.dataset.name;
+                        const productPrice = parseFloat(button.dataset.price);
+                        addToCart(productName, productPrice);
+                    });
+                });
+            });
+        </script>
+        </body>
+        </html>
+        
+
+    </div>
+</body>
+</html>

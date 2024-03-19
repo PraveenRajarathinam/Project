@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RustBucket</title>
+    <link rel="stylesheet" href="{{url_for('static',filename= 'B&C.css')}}">
+    <link href="{{url_for('static',filename= 'assets/font-awesome-4.7.0')}}">
+</head>
+<body>
+        <div>
+            <h2>CAR PRODUCTS</h2>
+            
+            <a href="/shop"><button id='cart-back' class="back-c">BACK</button></a>
+            <a href="/cart"><button id='cart-button' class="trigger cart-button-style">Show Cart</button></a>
+            
+            
+            <div id="shop">
+                
+                <div class="products ios apple" id="iphone-x">
+                    <img class="product-image" src="/static/assets/images/CAR1.jpg">
+                    <p class="product-name">Head Light</p>
+                    <p class="product-description">Indolite Head Light Lamp Assembly Toyota Innova Type 3 Left</p>
+                    <p class="product-price" value='999'>999</p>
+                    <button class="add-to-cart" data-name="Head Light" data-price="999">ADD TO CART</button>
+                </div>
+                
+                <div class="products android samsung" id="samsung-s9">
+                    <img class="product-image" src="/static/assets/images/CAR2.jpg">
+                    <p class="product-name">Wiper</p>
+                    <p class="product-description">Soft Wiper Blade EPE DNA 16"</p>
+                    <p class="product-price" value='789'>789</p>
+                    <button class="add-to-cart" data-name="Wiper" data-price="789">ADD TO CART</button>
+                </div>
+                
+                <div class="products android google" id="pixel-2">
+                    <img class="product-image" src="/static/assets/images/CAR3.jpg">
+                    <p class="product-name">Clutch Set</p>
+                    <p class="product-description">Valeo 404525 Clutch Set (Clutch + Pressure Plate) Ford Figo Diesel</p>
+                    <p class="product-price" value='876'>876</p>
+                    <button class="add-to-cart" data-name="Clutch Set" data-price="876">ADD TO CART</button>
+                </div>
+                
+                <div class="products android oneplus" id="oneplus-6">
+                    <img class="product-image" src="/static/assets/images/CAR4.jpg">
+                    <p class="product-name">Side Door Mirror</p>
+                    <p class="product-description">Far Vision Side Door Mirror Etios / Etios Liva (Manual) Type 2 (Left)</p>
+                    <p class="product-price" value='799'>799</p>
+                    <button class="add-to-cart" data-name="Side Door Mirror" data-price="799">ADD TO CART</button>
+                </div>
+                
+                <div class="products ios apple" id="iphone-8">
+                    <img class="product-image" src="/static/assets/images/CAR5.webp">
+                    <p class="product-name">Headlight Control</p>
+                    <p class="product-description">BMW E70 X5 X6 FRM MODULE HEADLIGHT CONTROL UNIT 9287250</p>
+                    <p class="product-price" value='719'>719</p>
+                    <button class="add-to-cart" data-name="Headlight Control" data-price="719">ADD TO CART</button>
+                </div>
+                
+                <div class="products android huawei" id="huawei-p20">
+                    <img class="product-image" src="/static/assets/images/CAR6.webp">
+                    <p class="product-name">Wiring Harness</p>
+                    <p class="product-description">Volvo 210 B Prime Voe 20886142 Wiring Harness</p>
+                    <p class="product-price" value='769'>769</p>
+                    <button class="add-to-cart" data-name="Wiring Harness" data-price="769">ADD TO CART</button>
+                </div>
+                
+                <div class="products android lg" id="lg-g7">
+                    <img class="product-image" src="/static/assets/images/CAR7.webp">
+                    <p class="product-name">A/C Liquid Line</p>
+                    <p class="product-description">Iron Car A/C Liquid Line Hose</p>
+                    <p class="product-price" value='699'>699</p>
+                    <button class="add-to-cart" data-name="A/C Liquid Line" data-price="699">ADD TO CART</button>
+                </div>
+                
+                <div class="products android huawei" id="huawei-mate-10-pro">
+                    <img class="product-image" src="/static/assets/images/CAR8.webp">
+                    <p class="product-name">Rear Axle</p>
+                    <p class="product-description">Electric car 48" Rear Axle, For E Rickshaw</p>
+                    <p class="product-price" value='899'>899</p>
+                    <button class="add-to-cart" data-name="Rear Axle" data-price="899">ADD TO CART</button>
+                </div>
+            </div>
+            
+        </div>
+            
+<script src="script.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+     const addToCartButtons = document.querySelectorAll('.add-to-cart');
+     const showCartButton = document.getElementById('show-cart-button');
+ 
+     addToCartButtons.forEach(button => {
+         button.addEventListener('click', () => {
+             const productName = button.dataset.name;
+             const productPrice = parseFloat(button.dataset.price);
+ 
+             let cart = localStorage.getItem('cart');
+             if (!cart) {
+                 cart = [];
+             } else {
+                 cart = JSON.parse(cart);
+             }
+ 
+             // Check if the product already exists in the cart
+             const existingProductIndex = cart.findIndex(item => item.name === productName);
+             if (existingProductIndex !== -1) {
+                 // Product already exists, update its quantity
+                 cart[existingProductIndex].quantity++;
+             } else {
+                 // Product does not exist, add it to the cart
+                 cart.push({ name: productName, price: productPrice, quantity: 1 });
+             }
+ 
+             localStorage.setItem('cart', JSON.stringify(cart));
+ 
+             // Display alert
+             alert(`${productName} has been added to the cart!`);
+ 
+             // Update the number of products in the cart button
+             updateCartButton();
+         });
+     });
+ 
+     function updateCartButton() {
+         let cart = localStorage.getItem('cart');
+         let numberOfProducts;
+         if (cart) {
+             cart = JSON.parse(cart);
+             // Calculate the total number of products
+             numberOfProducts = cart.reduce((total, item) => total + item.quantity, 0);
+         } else {
+             numberOfProducts = 0;
+         }
+         showCartButton.textContent = `Show Cart (${numberOfProducts})`;
+     }
+ });
+ 
+ 
+ </script>
+</body>
+</html>

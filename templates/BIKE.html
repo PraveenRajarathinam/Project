@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RustBucket</title>
+    <link rel="stylesheet" href="{{url_for('static',filename= 'B&C.css')}}">
+    <link href="{{url_for('static',filename= 'assets/font-awesome-4.7.0')}}">
+</head>
+<body>
+        <div>
+            <h2>BIKE PRODUCTS</h2>
+            
+            <a href="/shop"><button id='cart-back' class="back-c">BACK</button></a>
+            <a href="/cart"><button id='cart-button' class="trigger cart-button-style">Show Cart</button></a>
+            
+            
+            <div id="shop">
+                
+                <div class="products ios apple" id="iphone-x">
+                    <img class="product-image" src="/static/assets/images/BIKEP1.webp">
+                    <p class="product-name">Brake Disc Caliper</p>
+                    <p class="product-description">Star Front for Honda Shine SP 125 | CBR 150</p>
+                    <p class="product-price" value='999'>999</p>
+                    <button class="add-to-cart" data-name="Brake Disc Caliper" data-price="999">ADD TO CART</button>
+                </div>
+                
+                <div class="products android samsung" id="samsung-s9">
+                    <img class="product-image" src="/static/assets/images/BIKEP2.webp">
+                    <p class="product-name">Rear Brake Drum</p>
+                    <p class="product-description">Mahindra Duro | Rodeo | 4 Nut</p>
+                    <p class="product-price" value='789'>789</p>
+                    <button class="add-to-cart" data-name="Rear Brake Drum" data-price="789">ADD TO CART</button>
+                </div>
+                
+                <div class="products android google" id="pixel-2">
+                    <img class="product-image" src="/static/assets/images/BIKEP3.webp">
+                    <p class="product-name">Clutch Plate</p>
+                    <p class="product-description"> Royal Enfield Classic Electra 350 | Set of 6</p>
+                    <p class="product-price" value='876'>876</p>
+                    <button class="add-to-cart" data-name="Clutch Plate" data-price="876">ADD TO CART</button>
+                </div>
+                
+                <div class="products android oneplus" id="oneplus-6">
+                    <img class="product-image" src="/static/assets/images/BIKEP4.webp">
+                    <p class="product-name">Rear Disc Brake</p>
+                    <p class="product-description">Master Cylinder Assembly for Honda CBR 250</p>
+                    <p class="product-price" value='799'>799</p>
+                    <button class="add-to-cart" data-name="Rear Disc Brake" data-price="799">ADD TO CART</button>
+                </div>
+                
+                <div class="products ios apple" id="iphone-8">
+                    <img class="product-image" src="/static/assets/images/BIKEP5.webp">
+                    <p class="product-name">Head Ligh</p>
+                    <p class="product-description">Head Light Set (For Hero CBZ Xtreme Old Model)</p>
+                    <p class="product-price" value='719'>719</p>
+                    <button class="add-to-cart" data-name="Head Ligh" data-price="719">ADD TO CART</button>
+                </div>
+                
+                <div class="products android huawei" id="huawei-p20">
+                    <img class="product-image" src="/static/assets/images/BIKEP6.webp">
+                    <p class="product-name">Silencer</p>
+                    <p class="product-description">Silencer for Hero CD Deluxe/ CD Dawn</p>
+                    <p class="product-price" value='769'>769</p>
+                    <button class="add-to-cart" data-name="Silencer" data-price="769">ADD TO CART</button>
+                </div>
+                
+                <div class="products android lg" id="lg-g7">
+                    <img class="product-image" src="/static/assets/images/BIKEP7.webp">
+                    <p class="product-name">Side Panel</p>
+                    <p class="product-description">Side Panel for Bajaj Avenger | Turqoise Blue</p>
+                    <p class="product-price" value='699'>699</p>
+                    <button class="add-to-cart" data-name="Side Panel" data-price="699">ADD TO CART</button>
+                </div>
+                
+                <div class="products android huawei" id="huawei-mate-10-pro">
+                    <img class="product-image" src="/static/assets/images/BIKEP8.webp">
+                    <p class="product-name">Petrol Tank</p>
+                    <p class="product-description">Ensons Petrol Tank for Hero CD 100 (Black)</p>
+                    <p class="product-price" value='899'>899</p>
+                    <button class="add-to-cart" data-name="Petrol Tank" data-price="899">ADD TO CART</button>
+                </div>
+            </div>
+            
+        </div>
+            
+<script src="script.js">  </script>
+
+    <script>
+   document.addEventListener('DOMContentLoaded', () => {
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    const showCartButton = document.getElementById('show-cart-button');
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const productName = button.dataset.name;
+            const productPrice = parseFloat(button.dataset.price);
+
+            let cart = localStorage.getItem('cart');
+            if (!cart) {
+                cart = [];
+            } else {
+                cart = JSON.parse(cart);
+            }
+
+            // Check if the product already exists in the cart
+            const existingProductIndex = cart.findIndex(item => item.name === productName);
+            if (existingProductIndex !== -1) {
+                // Product already exists, update its quantity
+                cart[existingProductIndex].quantity++;
+            } else {
+                // Product does not exist, add it to the cart
+                cart.push({ name: productName, price: productPrice, quantity: 1 });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            // Display alert
+            alert(`${productName} has been added to the cart!`);
+
+            // Update the number of products in the cart button
+            updateCartButton();
+        });
+    });
+
+    function updateCartButton() {
+        let cart = localStorage.getItem('cart');
+        let numberOfProducts;
+        if (cart) {
+            cart = JSON.parse(cart);
+            // Calculate the total number of products
+            numberOfProducts = cart.reduce((total, item) => total + item.quantity, 0);
+        } else {
+            numberOfProducts = 0;
+        }
+        showCartButton.textContent = `Show Cart (${numberOfProducts})`;
+    }
+});
+
+
+</script>
+</body>
+</html>
